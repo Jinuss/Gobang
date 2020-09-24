@@ -1,6 +1,10 @@
 <template>
-	<u-action-sheet :list="list" v-model="show"></u-action-sheet>
-	<canvas canvas-id="map" style="328px;height:582px;"></canvas>
+	<uni-drawer >
+		<view style="padding:30rpx;">
+			<u-action-sheet :list="list" v-model="show"></u-action-sheet>
+			<canvas canvas-id="map" style="328px;height:582px;"></canvas>
+		</view>
+	</uni-drawer>
 </template>
 
 <script>
