@@ -1,6 +1,7 @@
 <template>
 	<view class="content">
-		<canvas @click="user($event)" style="width: 450px; height: 450px;" canvas-id="map" id="firstCanvas"></canvas>
+		<canvas @click="user($event)" style="width: 360px; height: 450px;" canvas-id="map" id="firstCanvas"></canvas>
+	    <u-button shape="square" size="mini" type="primary" plain="" style="width:100rpx">重置</u-button>
 	</view>
 </template>
 
@@ -14,23 +15,24 @@
 				computerWin: [],
 				over: false, //游戏是否结束,
 				count: 0,
-				me:true,
-				win:[]
+				me: true,
+				win: [],
+				ctx: {}
 			}
 		},
 		onReady(e) {
-			var conText = uni.createCanvasContext('map')
+			this.ctx = uni.createCanvasContext('map')
 			//	棋盘
-			conText.strokeStyle = "#FD7000"
+			this.ctx.strokeStyle = "#636766"
 			for (var i = 0; i < 15; i++) {
-				conText.moveTo(15 + i * 30, 15);
-				conText.lineTo(15 + i * 30, 435);
-				conText.stroke();
-				conText.moveTo(15, 15 + i * 30);
-				conText.lineTo(435, 15 + i * 30);
-				conText.stroke();
+				this.ctx.moveTo(i * 30, 0);
+				this.ctx.lineTo(i * 30, 435);
+				this.ctx.stroke();
+				this.ctx.moveTo(0, i * 30);
+				this.ctx.lineTo(360,i * 30);
+				this.ctx.stroke();
 			}
-			conText.draw()
+			this.ctx.draw(true);
 			//棋盘二位数组初始化，使得一个位置只能下一个（种）棋子
 			for (var i = 0; i < 15; i++) {
 				this.$set(this.chessBoard, i, []);
@@ -41,8 +43,8 @@
 			this.winSchema()
 			//计算机和用户胜局数组的初始化
 			for (var i = 0; i < this.count; i++) {
-				this.$set(this.myWin,i,0);
-				this.$set(this.computerWin,i,0);
+				this.$set(this.myWin, i, 0);
+				this.$set(this.computerWin, i, 0);
 			}
 		},
 		onLoad() {
@@ -63,6 +65,7 @@
 							this.computerWin[k] = 6;
 							if (this.myWin[k] == 5) {
 								this.over = true;
+								this.$u.toast('恭喜，你获胜', 3000)
 							}
 						}
 					}
@@ -71,16 +74,15 @@
 						this.computer();
 					}
 				} else {
-					alert("提示：这个位置已经有棋子了！");
+					this.$u.toast("这个位置已经有棋子了！");
 				}
 			},
 			//棋子的实现
 			oneStep(i, j, me) {
-				var conText = uni.createCanvasContext('map')
-				conText.beginPath();
-				conText.arc(15 + i * 30, 15 + j * 30, 13, 0, 2 * Math.PI);
-				conText.closePath();
-				var gradient = conText.createCircularGradient(17 + i * 30, 13 + j * 30, 13, 17 + i * 30, 13 + j * 30, 0);
+				this.ctx.beginPath();
+				this.ctx.arc(i * 30, j * 30, 13, 0, 2 * Math.PI);
+				this.ctx.closePath();
+				var gradient = this.ctx.createCircularGradient(17 + i * 30, 13 + j * 30, 13, 17 + i * 30, 13 + j * 30, 0);
 				if (me) {
 					gradient.addColorStop(0, "#0A0A0A");
 					gradient.addColorStop(1, "#636766");
@@ -88,8 +90,9 @@
 					gradient.addColorStop(0, "#D1D1D1");
 					gradient.addColorStop(1, "#F9F9F9");
 				}
-				conText.fillStyle = gradient;
-				conText.fill();
+				this.ctx.setFillStyle(gradient);
+				this.ctx.fill();
+				this.ctx.draw(true);
 			},
 			//赢局情况
 			winSchema() {
@@ -155,7 +158,7 @@
 				for (var i = 0; i < 15; i++) {
 					for (var j = 0; j < 15; j++) {
 						if (this.chessBoard[i][j] == 0) {
-							for (var k = 0; k < count; k++) {
+							for (var k = 0; k < this.count; k++) {
 								if (this.win[i][j][k]) {
 									if (this.myWin[k] == 1) {
 										myScore[i][j] += 20;
@@ -208,6 +211,7 @@
 						this.computerWin[k]++;
 						if (this.computerWin[k] == 5) {
 							this.over = true;
+							this.$u.toast('计算机获胜', 3000)
 						}
 					}
 				}
@@ -219,10 +223,12 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 	.content {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		flex-direction: column;
+		padding: 12rpx;
 	}
 </style>

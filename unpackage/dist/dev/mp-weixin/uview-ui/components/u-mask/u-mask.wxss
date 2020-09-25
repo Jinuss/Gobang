@@ -25,20 +25,23 @@
 /* 透明度 */
 /* 文章场景相关 */
 /* uni.scss */
-.content.data-v-57280228 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-          justify-content: center;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-          align-items: center;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-          flex-direction: column;
-  padding: 12rpx;
+.u-mask.data-v-4bfa3b00 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  -webkit-transition: -webkit-transform 0.3s;
+  transition: -webkit-transform 0.3s;
+  transition: transform 0.3s;
+  transition: transform 0.3s, -webkit-transform 0.3s;
+}
+.u-mask-show.data-v-4bfa3b00 {
+  opacity: 1;
+}
+.u-mask-zoom.data-v-4bfa3b00 {
+  -webkit-transform: scale(1.2, 1.2);
+          transform: scale(1.2, 1.2);
 }
 

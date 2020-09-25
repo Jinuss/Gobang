@@ -1,4 +1,5 @@
 {
-  "navigationBarTitleText": "五子棋",
-  "usingComponents": {}
+  "usingComponents": {
+    "u-button": "/uview-ui/components/u-button/u-button"
+  }
 }

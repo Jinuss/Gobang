@@ -1,6 +1,7 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/components/map/map"
   ],
   "subPackages": [],
   "window": {
@@ -11,5 +12,5 @@
   },
   "permission": {},
   "usingComponents": {},
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap13.json"
 }
