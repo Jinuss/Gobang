@@ -153,24 +153,35 @@ var _default =
       count: 0,
       me: true,
       win: [],
-      ctx: {} };
+      ctx: {},
+      ceilWidth: 0,
+      chessBoardmap: new Uint8ClampedArray([]) };
 
   },
   onReady: function onReady(e) {
     this.ctx = uni.createCanvasContext('map');
-    this.ctx.drawImage('/static/chessbg.jpg', 0, 0, 360, 360);
-    this.ctx.draw();
-    //	棋盘
-    this.ctx.strokeStyle = "#636766";
-    for (var i = 0; i < 16; i++) {
-      this.ctx.moveTo(i * 24, 0);
-      this.ctx.lineTo(i * 24, 360);
-      this.ctx.stroke();
-      this.ctx.moveTo(0, i * 24);
-      this.ctx.lineTo(360, i * 24);
-      this.ctx.stroke();
-    }
-    this.ctx.draw(true);
+    var that = this;
+    var width = 0;
+    uni.getSystemInfo({
+      success: function success(res) {
+        width = res.windowWidth - 15;
+        that.ctx.drawImage('/static/chessbg.jpg', 0, 0, width, width);
+        that.ctx.draw();
+        //	棋盘
+        that.ceilWidth = width / 15;
+        that.ctx.strokeStyle = "#636766";
+        for (var i = 0; i < 16; i++) {
+          that.ctx.moveTo(i * that.ceilWidth, 0);
+          that.ctx.lineTo(i * that.ceilWidth, width);
+          that.ctx.stroke();
+          that.ctx.moveTo(0, i * that.ceilWidth);
+          that.ctx.lineTo(width, i * that.ceilWidth);
+          that.ctx.stroke();
+        }
+        that.ctx.draw(true);
+      } });
+
+
     //棋盘二位数组初始化，使得一个位置只能下一个（种）棋子
     for (var i = 0; i < 15; i++) {
       this.$set(this.chessBoard, i, []);
@@ -195,12 +206,31 @@ var _default =
       this.computerWin = [];
       this.myWin = [];
       this.win = [];
+      this.ctx.height = this.ctx.height;
+      var data = this.chessBoardmap;
+      uni.canvasPutImageData({
+        canvasId: 'map',
+        x: 0,
+        y: 0,
+        width: 360,
+        height: 360,
+        data: data,
+        success: function success(res) {
+          console.log(res);
+        },
+        fail: function fail(err) {
+          console.log(err);
+        },
+        complete: function complete(resp) {
+          console.log(resp);
+        } },
+      this);
     },
     //用户下棋
     user: function user(ev) {
       if (this.over || !this.me) return;
-      var i = Math.floor(ev.detail.x / 24);
-      var j = Math.floor(ev.detail.y / 24);
+      var i = Math.floor(ev.detail.x / this.ceilWidth);
+      var j = Math.floor(ev.detail.y / this.ceilWidth);
       if (this.chessBoard[i][j] == 0) {
         this.oneStep(i, j, this.me);
         this.chessBoard[i][j] = 1;
@@ -225,9 +255,9 @@ var _default =
     //棋子的实现
     oneStep: function oneStep(i, j, me) {
       this.ctx.beginPath();
-      this.ctx.arc(i * 24, j * 24, 10, 0, 2 * Math.PI);
+      this.ctx.arc(i * this.ceilWidth, j * this.ceilWidth, 10, 0, 2 * Math.PI);
       this.ctx.closePath();
-      var gradient = this.ctx.createCircularGradient(17 + i * 24, 13 + j * 24, 13, 17 + i * 24, 13 + j * 24, 0);
+      var gradient = this.ctx.createCircularGradient(12 + i * this.ceilWidth, 13 + j * this.ceilWidth, 13, 12 + i * this.ceilWidth, 13 + j * this.ceilWidth, 0);
       if (me) {
         gradient.addColorStop(0, "#0A0A0A");
         gradient.addColorStop(1, "#636766");

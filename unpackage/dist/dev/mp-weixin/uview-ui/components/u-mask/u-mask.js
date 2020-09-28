@@ -218,8 +218,8 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
       style.zIndex = -1;
       style.transition = "all ".concat(this.duration / 1000, "s ease-in-out");
       // 判断用户传递的对象是否为空，不为空就进行合并
-      if (Object.keys(this.customStyle).length) style = _objectSpread({},
-      style, {},
+      if (Object.keys(this.customStyle).length) style = _objectSpread(_objectSpread({},
+      style),
       this.customStyle);
 
       return style;

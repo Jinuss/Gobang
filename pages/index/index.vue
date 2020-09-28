@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<canvas @click="user($event)" style="width: 360px; height: 360px;" canvas-id="map" id="mapcanvas"></canvas>
+		<canvas @click="user($event)" style="width: 720rpx; height: 720rpx;" canvas-id="map" id="mapcanvas"></canvas>
 		<u-button shape="square" size="mini" type="primary" plain="" style="width:100rpx" @click="reset">重置</u-button>
 	</view>
 </template>
@@ -18,35 +18,34 @@
 				me: true,
 				win: [],
 				ctx: {},
+				ceilWidth: 0,
 				chessBoardmap: new Uint8ClampedArray([])
 			}
 		},
 		onReady(e) {
 			this.ctx = uni.createCanvasContext('map')
-			this.ctx.drawImage('/static/chessbg.jpg', 0, 0, 360, 360)
-			this.ctx.draw()
-			//	棋盘
-			this.ctx.strokeStyle = "#636766"
-			for (var i = 0; i < 16; i++) {
-				this.ctx.moveTo(i * 24, 0);
-				this.ctx.lineTo(i * 24, 360);
-				this.ctx.stroke();
-				this.ctx.moveTo(0, i * 24);
-				this.ctx.lineTo(360, i * 24);
-				this.ctx.stroke();
-			}
-			this.ctx.draw(true);
-			let that=this;
-			uni.canvasGetImageData({
-				canvasId: 'map',
-				x: 0,
-				y: 0,
-				width: 360,
-				height: 360,
-				success:(res)=>{
-					that.chessBoardmap = res.data;
+			let that = this;
+			let width = 0;
+			uni.getSystemInfo({
+				success(res) {
+					width = res.windowWidth - 15;
+					that.ctx.drawImage('/static/chessbg.jpg', 0, 0, width, width)
+					that.ctx.draw();
+					//	棋盘
+					that.ceilWidth = width / 15;
+					that.ctx.strokeStyle = "#636766"
+					for (var i = 0; i < 16; i++) {
+						that.ctx.moveTo(i * that.ceilWidth, 0);
+						that.ctx.lineTo(i * that.ceilWidth, width);
+						that.ctx.stroke();
+						that.ctx.moveTo(0, i * that.ceilWidth);
+						that.ctx.lineTo(width, i * that.ceilWidth);
+						that.ctx.stroke();
+					}
+					that.ctx.draw(true);
 				}
-			},this)
+			})
+
 			//棋盘二位数组初始化，使得一个位置只能下一个（种）棋子
 			for (var i = 0; i < 15; i++) {
 				this.$set(this.chessBoard, i, []);
@@ -71,8 +70,8 @@
 				this.computerWin = [];
 				this.myWin = [];
 				this.win = [];
-				this.ctx.height=this.ctx.height;
-				let data= this.chessBoardmap;
+				this.ctx.height = this.ctx.height;
+				let data = this.chessBoardmap;
 				uni.canvasPutImageData({
 					canvasId: 'map',
 					x: 0,
@@ -89,13 +88,13 @@
 					complete(resp) {
 						console.log(resp)
 					}
-				},this)
+				}, this)
 			},
 			//用户下棋
 			user(ev) {
 				if (this.over || !this.me) return;
-				var i = Math.floor(ev.detail.x / 24);
-				var j = Math.floor(ev.detail.y / 24);
+				var i = Math.floor(ev.detail.x / this.ceilWidth);
+				var j = Math.floor(ev.detail.y / this.ceilWidth);
 				if (this.chessBoard[i][j] == 0) {
 					this.oneStep(i, j, this.me);
 					this.chessBoard[i][j] = 1;
@@ -120,9 +119,9 @@
 			//棋子的实现
 			oneStep(i, j, me) {
 				this.ctx.beginPath();
-				this.ctx.arc(i * 24, j * 24, 10, 0, 2 * Math.PI);
+				this.ctx.arc(i * this.ceilWidth, j * this.ceilWidth, 10, 0, 2 * Math.PI);
 				this.ctx.closePath();
-				var gradient = this.ctx.createCircularGradient(12 + i * 24, 13 + j * 24, 13, 12 + i * 24, 13 + j * 24, 0);
+				var gradient = this.ctx.createCircularGradient(12 + i * this.ceilWidth, 13 + j * this.ceilWidth, 13, 12 + i * this.ceilWidth, 13 + j * this.ceilWidth, 0);
 				if (me) {
 					gradient.addColorStop(0, "#0A0A0A");
 					gradient.addColorStop(1, "#636766");
